@@ -1,0 +1,56 @@
+﻿@model ControlDeGastosMVC.API.ViewModels.UsuarioPerfil
+
+@{
+    ViewData["Title"] = "Editar Perfil";
+}
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
+        <div class="card shadow p-4 rounded">
+            <h2>Editar Perfil</h2>
+            <hr />
+            <form asp-action="EditPerfil" method="post">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label asp-for="NombreCompleto" class="control-label">Nombre Completo</label>
+                    <input asp-for="NombreCompleto" class="form-control" />
+                    <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label">Correo Electrónico</label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <h4>Cambiar contraseña</h4>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PasswordActual">Contraseña Actual</label>
+                    <input asp-for="PasswordActual" type="password" class="form-control" />
+                    <span asp-validation-for="PasswordActual" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NuevaPassword">Nueva Contraseña</label>
+                    <input asp-for="NuevaPassword" type="password" class="form-control" />
+                    <span asp-validation-for="NuevaPassword" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ConfirmarPassword">Confirmar Nueva Contraseña</label>
+                    <input asp-for="ConfirmarPassword" type="password" class="form-control" />
+                    <span asp-validation-for="ConfirmarPassword" class="text-danger"></span>
+                </div>
+
+
+                <br/>
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

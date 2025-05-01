@@ -1,0 +1,114 @@
+﻿@model ControlDeGastosMVC.API.ViewModels.EstadisticaGastosViewModel
+@{
+    ViewData["Title"] = "Estadísticas de gastos";
+    var categoriasJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Categorias);
+    var montosJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Montos);
+}
+<h1>Estadísticas</h1>
+<hr />
+<div class="container mb-4">
+    <div class="row text-center">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total gastado</h6>
+                    <h4 class="text-success">$@Model.TotalGastado.ToString("N2")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Categoría con más gasto</h6>
+                    <h5>@Model.CategoriaTop</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Cantidad de gastos</h6>
+                    <h5>@Model.CantidadGastos</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="card col-md-6 shadow-sm">
+            <h5 class="text-center">Gráfico de barras</h5>
+            <div style="height: 400px;">
+                <canvas id="graficoBarras"></canvas>
+            </div>
+        </div>
+
+        <div class="card col-md-6 shadow-sm">
+            <h5 class="text-center">Gráfico de torta</h5>
+            <div style="height: 400px;">
+                <canvas id="graficoTorta"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<hr />
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const categorias = @Html.Raw(categoriasJson);
+    const montos = @Html.Raw(montosJson);
+
+    // Gráfico de barras
+    const ctxBar = document.getElementById('graficoBarras');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: categorias,
+            datasets: [{
+                label: 'Total gastado ($)',
+                data: montos,
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#ff36cc',
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Gráfico de torta
+    const ctxTorta = document.getElementById('graficoTorta');
+    new Chart(ctxTorta, {
+        type: 'doughnut',
+        data: {
+            labels: categorias,
+            datasets: [{
+                label: 'Total gastado ($)',
+                data: montos,
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+
+

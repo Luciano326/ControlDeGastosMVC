@@ -1,0 +1,87 @@
+﻿@model IEnumerable<ControlDeGastosMVC.API.Models.Gasto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Control de Gastos</h1>
+<hr/>   
+<div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+    <div class="btn-group" role="group" aria-label="Acciones">
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Registrar Gasto
+        </a>
+        <a asp-action="Estadisticas" class="btn btn-outline-primary">
+            <i class="bi bi-bar-chart me-1"></i> Ver Estadísticas
+        </a>
+        <button class="btn btn-outline-secondary" disabled>
+            <i class="bi bi-tools me-1"></i> Próximamente...
+        </button>
+    </div>
+
+    <form asp-action="Buscar" method="get" class="d-flex mt-2 mt-md-0" role="search">
+        <input name="query" type="text" class="form-control me-2" placeholder="Buscar gastos..." />
+        <button type="submit" class="d-flex btn btn-primary">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+    </form>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th class="text-center">@Html.DisplayName("Descripcón")</th>
+                <th class="text-center">@Html.DisplayNameFor(model => model.First().Monto)</th>
+                <th class="text-center">@Html.DisplayNameFor(model => model.First().Categoria)</th>
+                <th class="text-center">@Html.DisplayNameFor(model => model.First().Fecha)</th>
+                <th class="text-center">@Html.DisplayName("Fecha Creación")</th>
+                <th class="text-center">@Html.DisplayName("Acciones")</th>
+                <th class="text-center"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.Descripcion)</td>
+                    <td class="text-center">$@Html.DisplayFor(modelItem => item.Monto)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.Categoria)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.Fecha)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.FechaCreacion)</td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Editar</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-warning">Detalles</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+
+}
+else
+{
+    <div class="card">
+        <div class="card-body text-center">
+            No hay registros de gastos.
+        </div>
+    </div>
+}
+
+

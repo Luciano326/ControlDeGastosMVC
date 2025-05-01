@@ -1,0 +1,45 @@
+﻿@model ControlDeGastosMVC.API.Models.Gasto
+
+@{
+    ViewData["Title"] = "Crear";
+}
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
+        <div class="card shadow p-4 rounded">
+            <h4 class="card-title mb-4">Registrar Gasto</h4>
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Descripcion" class="control-label">Descripción</label>
+                    <input asp-for="Descripcion" class="form-control" />
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Monto" class="control-label"></label>
+                    <input name="MontoText" class="form-control" />
+                    <span asp-validation-for="Monto" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Categoria" class="control-label"></label>
+                    <input asp-for="Categoria" class="form-control" />
+                    <span asp-validation-for="Categoria" class="text-danger"></span>
+                </div>
+            
+                <div class="form-group">
+                    <label asp-for="Fecha" class="control-label"></label>
+                    <input asp-for="Fecha" class="form-control" />
+                    <span asp-validation-for="Fecha" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <input type="submit" value="💾 Registrar" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-outline-primary">↩ Volver a la lista</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,40 @@
+# Build folders
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+
+# Rider (JetBrains)
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# NuGet packages (si están en packages/)
+packages/
+
+# Environment-specific settings
+appsettings.Development.json
+secrets.json
+
+# node modules (por si usás npm en el futuro)
+node_modules/
+
+# dotnet artifacts
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# EF Core migrations snapshots (opcional si querés excluir snapshots)
+# **/*_Snapshot.cs

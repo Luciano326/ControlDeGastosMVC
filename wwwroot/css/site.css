@@ -1,0 +1,32 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.container {
+    flex: 1;
+}
+.perfil-icono {
+    color: #0024ff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+    .perfil-icono:hover {
+        color: #0024ff;
+        transform: scale(1.05);
+    }

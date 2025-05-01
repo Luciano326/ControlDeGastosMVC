@@ -1,0 +1,40 @@
+﻿@model ControlDeGastosMVC.API.ViewModels.UsuarioPerfil
+@{
+    ViewData["Title"] = "Cambiar Contraseña";
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
+        <div class="card shadow p-4 rounded">
+            <h2>Cambiar Contraseña</h2>
+            <hr />
+            <form asp-action="CambiarClave" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="email" value="@ViewBag.Email" />
+                <input type="hidden" name="token" value="@ViewBag.Token" />
+
+                <div class="form-group">
+                    <label for="NuevaPassword">Nueva Contraseña</label>
+                    <input type="password" name="nuevaClave" class="form-control" required />
+                    <span asp-validation-for="NuevaPassword" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="ConfirmarPassword">Confirmar Nueva Contraseña</label>
+                    <input type="password" name="confirmarClave" class="form-control" required />
+                    <span asp-validation-for="ConfirmarPassword" class="text-danger"></span>
+                </div>
+
+                <br />
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

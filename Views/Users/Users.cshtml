@@ -1,0 +1,62 @@
+﻿@model IEnumerable<ControlDeGastosMVC.API.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<h1>Control de Usuarios</h1>
+<hr />
+<br />
+<p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">↩ Volver al inicio</a>
+</p>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th class="text-center">@Html.DisplayName("Nombre Completo")</th>
+            <th class="text-center">@Html.DisplayName("Correo Electronico")</th>
+            <th class="text-center">@Html.DisplayName("Rol")</th>
+            <th class="text-center">@Html.DisplayName("Fecha Creación")</th>
+            <th class="text-center">@Html.DisplayName("Estado")</th>
+            <th class="text-center">@Html.DisplayName("Acciones")</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.NombreCompleto)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.Email)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.Rol)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.FechaCreacion)</td>
+                <td class="text-center">
+                    @if(item.EsActivo == true)
+                    {
+                        @Html.DisplayName("Activo")
+                    }
+                    else
+                    {
+                        @Html.DisplayName("Inactivo")
+
+                    }
+                </td>
+                <td class="text-center">
+                    @if (item.EsActivo)
+                    {
+                        <a asp-action="Desactivar" asp-route-id="@item.Id" class="btn btn-danger">Suspender</a>
+                    }else{
+                        <a asp-action="Activar" asp-route-id="@item.Id" class="btn btn-primary">Activar</a>
+                    }
+                    @if (item.Rol == "Administrador")
+                    {
+                        <a asp-action="Descender" asp-route-id="@item.Id" class="btn btn-warning">Descender</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Ascender" asp-route-id="@item.Id" class="btn btn-success">Ascender</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
