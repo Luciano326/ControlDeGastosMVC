@@ -24,29 +24,37 @@ namespace ControlDeGastosMVC.API.Controllers
             _context = context;
         }
         #region 1 Get Gasto        
-        
+
         [Authorize]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string searchString, int page = 1)
         {
             int pageSize = 10;
+            int usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var gastosQuery = _context.Gastos
+                .Where(g => g.UsuarioId == usuarioId);
 
-            var gastosUsuario = _context.Gastos
-                .Where(g => g.UsuarioId == userId)
-                .OrderByDescending(g => g.FechaCreacion);
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                gastosQuery = gastosQuery.Where(g =>
+                    g.Descripcion.Contains(searchString) ||
+                    (g.Categoria != null && g.Categoria.Contains(searchString)));
+            }
 
-            var totalGastos = await gastosUsuario.CountAsync();
-            var gastosPaginados = await gastosUsuario
+            var totalGastos = await gastosQuery.CountAsync();
+            var gastosPaginados = await gastosQuery
+                .OrderByDescending(g => g.FechaCreacion)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             ViewBag.TotalPages = (int)Math.Ceiling(totalGastos / (double)pageSize);
             ViewBag.CurrentPage = page;
+            ViewBag.SearchString = searchString;
 
             return View(gastosPaginados);
         }
+
 
 
         #endregion
@@ -243,6 +251,7 @@ namespace ControlDeGastosMVC.API.Controllers
         #endregion
 
         #region 6 GET: Gasto/Estadisticas
+        [Authorize]
         public async Task<IActionResult> Estadisticas()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

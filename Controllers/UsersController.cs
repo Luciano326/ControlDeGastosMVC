@@ -147,27 +147,28 @@ namespace ControlDeGastosMVC.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ActionName("EditPerfil")]
         [ValidateAntiForgeryToken]
-        [Authorize]
         public async Task<IActionResult> EditPerfil(UsuarioPerfil model)
         {
             var userIdClaim = User.FindFirstValue("UserId");
-            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+            if (!int.TryParse(userIdClaim, out int userId))
+                return Unauthorized();
 
-            int userId = int.Parse(userIdClaim);
             var usuarioOriginal = await _context.Usuarios.FindAsync(userId);
             if (usuarioOriginal == null) return NotFound();
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    usuarioOriginal.NombreCompleto = model.NombreCompleto;
-                    usuarioOriginal.Email = model.Email;
+                usuarioOriginal.NombreCompleto = model.NombreCompleto;
+                usuarioOriginal.Email = model.Email;
 
-                    // Cambio de contraseña (si los campos están completos)
-                    // Validar contraseña actual
+                // Cambio de contraseña (si los campos están completos)
+                if (!string.IsNullOrWhiteSpace(model.PasswordActual) &&
+                    !string.IsNullOrWhiteSpace(model.NuevaPassword) &&
+                    !string.IsNullOrWhiteSpace(model.ConfirmarPassword))
+                {
                     if (_passwordHasher.VerifyHashedPassword(usuarioOriginal, usuarioOriginal.PasswordHash, model.PasswordActual)
                         != PasswordVerificationResult.Success)
                     {
@@ -175,41 +176,32 @@ namespace ControlDeGastosMVC.API.Controllers
                         return View(model);
                     }
 
-                    // Validar que coincidan
                     if (model.NuevaPassword != model.ConfirmarPassword)
                     {
                         ModelState.AddModelError("ConfirmarPassword", "Las contraseñas nuevas no coinciden.");
                         return View(model);
                     }
 
-                    // Hashear la nueva contraseña correctamente
                     usuarioOriginal.PasswordHash = _passwordHasher.HashPassword(usuarioOriginal, model.NuevaPassword);
-
-
-                    await _context.SaveChangesAsync();
-                    // Crear nuevos claims actualizados
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, model.NombreCompleto),
-                        new Claim(ClaimTypes.Email, model.Email),
-                        new Claim("UserId", userId.ToString()),
-                        new Claim(ClaimTypes.Role, usuarioOriginal.Rol)
-                    };
-
-                    // Crear nueva identidad
-                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    // Reautenticar al usuario
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
-
-                    TempData["ToastMensaje"] = "El perfil fue editado correctamente.";
-                    TempData["ToastTipo"] = "primary";
-                    return RedirectToAction("EditPerfil");
                 }
-                catch (DbUpdateConcurrencyException)
+
+                await _context.SaveChangesAsync();
+
+                var claims = new List<Claim>
                 {
-                    throw;
-                }
+                    new Claim(ClaimTypes.NameIdentifier, usuarioOriginal.Id.ToString()),
+                    new Claim("UserId", usuarioOriginal.Id.ToString()),
+                    new Claim(ClaimTypes.Name, model.NombreCompleto),
+                    new Claim(ClaimTypes.Email, model.Email),
+                    new Claim(ClaimTypes.Role, usuarioOriginal.Rol)
+                };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+
+                TempData["ToastMensaje"] = "El perfil fue editado correctamente.";
+                TempData["ToastTipo"] = "primary";
+                return RedirectToAction("EditPerfil");
             }
 
             return View(model);

@@ -19,10 +19,10 @@
         </button>
     </div>
 
-    <form asp-action="Buscar" method="get" class="d-flex mt-2 mt-md-0" role="search">
-        <input name="query" type="text" class="form-control me-2" placeholder="Buscar gastos..." />
+    <form asp-action="Index" method="get" class="d-flex mt-2 mt-md-0" role="search">
+        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control me-4" placeholder="Buscar gastos..." />
         <button type="submit" class="d-flex btn btn-primary">
-            <i class="bi bi-search"></i> Buscar
+            <i class="bi bi-search me-3"></i>Buscar
         </button>
     </form>
 </div>

@@ -15,6 +15,10 @@ namespace ControlDeGastosMVC.API.Controllers
     {
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index","Home");
+            }
             return View();
         }
 
@@ -55,6 +59,7 @@ namespace ControlDeGastosMVC.API.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()), // 👈 Necesario
+                new Claim("UserId", usuario.Id.ToString()), 
                 new Claim(ClaimTypes.Name, usuario.NombreCompleto),
                 new Claim(ClaimTypes.Email, usuario.Email),
                 new Claim(ClaimTypes.Role, usuario.Rol) // si estás usando roles
