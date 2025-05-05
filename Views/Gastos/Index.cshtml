@@ -14,31 +14,47 @@
         <a asp-action="Estadisticas" class="btn btn-outline-primary">
             <i class="bi bi-bar-chart me-1"></i> Ver Estadísticas
         </a>
-        <button class="btn btn-outline-secondary" disabled>
-            <i class="bi bi-tools me-1"></i> Próximamente...
-        </button>
+        <a asp-action="ExportarPdf" class="btn btn-outline-danger">
+            <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+        </a>
+        <a asp-action="ExportarExcel" class="btn btn-outline-success">
+            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        </a>
     </div>
+    <form asp-action="Index" method="get" class="d-flex flex-wrap align-items-end gap-2 mb-3">
+        <input type="number" name="mes" class="form-control w-auto"
+               placeholder="Mes" min="1" max="12"
+               value="@ViewBag.Mes" />
 
-    <form asp-action="Index" method="get" class="d-flex mt-2 mt-md-0" role="search">
-        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control me-4" placeholder="Buscar gastos..." />
-        <button type="submit" class="d-flex btn btn-primary">
-            <i class="bi bi-search me-3"></i>Buscar
+        <input type="number" name="anio" class="form-control w-auto"
+               placeholder="Año" min="2000" max="2100"
+               value="@ViewBag.Anio" />
+
+        <input type="text" name="searchString" class="form-control w-auto"
+               placeholder="Buscar descripción o categoría"
+               value="@ViewBag.SearchString" />
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search me-1"></i> Buscar
         </button>
+
+        <a href="@Url.Action("Index", "Gastos")" class="btn btn-outline-secondary">
+                <i class="bi bi-eraser-fill"></i>
+         </a>
     </form>
 </div>
 
 @if (Model != null && Model.Any())
 {
-    <table class="table">
+    <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>
-                <th class="text-center">@Html.DisplayName("Descripcón")</th>
+                <th class="text-center">@Html.DisplayName("Descripción")</th>
                 <th class="text-center">@Html.DisplayNameFor(model => model.First().Monto)</th>
                 <th class="text-center">@Html.DisplayNameFor(model => model.First().Categoria)</th>
                 <th class="text-center">@Html.DisplayNameFor(model => model.First().Fecha)</th>
                 <th class="text-center">@Html.DisplayName("Fecha Creación")</th>
                 <th class="text-center">@Html.DisplayName("Acciones")</th>
-                <th class="text-center"></th>
             </tr>
         </thead>
 
@@ -66,9 +82,15 @@
             <ul class="pagination justify-content-center">
                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                 {
-                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
-                    </li>
+                <a class="btn btn-outline-primary mx-1 @(i == ViewBag.CurrentPage ? "active" : "")"
+                        href="@Url.Action("Index", new {
+                    page = i,
+                    searchString = ViewBag.SearchString,
+                    mes = ViewBag.Mes,
+                    anio = ViewBag.Anio
+                    })">
+                    @i
+                </a>
                 }
             </ul>
         </nav>

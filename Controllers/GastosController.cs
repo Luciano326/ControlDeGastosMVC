@@ -26,7 +26,7 @@ namespace ControlDeGastosMVC.API.Controllers
         #region 1 Get Gasto        
 
         [Authorize]
-        public async Task<IActionResult> Index(string searchString, int page = 1)
+        public async Task<IActionResult> Index(int? mes, int? anio, string searchString, int page = 1)
         {
             int pageSize = 10;
             int usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
@@ -34,7 +34,12 @@ namespace ControlDeGastosMVC.API.Controllers
             var gastosQuery = _context.Gastos
                 .Where(g => g.UsuarioId == usuarioId);
 
-            if (!string.IsNullOrEmpty(searchString))
+            if (mes.HasValue && anio.HasValue)
+            {
+                gastosQuery = gastosQuery.Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
                 gastosQuery = gastosQuery.Where(g =>
                     g.Descripcion.Contains(searchString) ||
@@ -42,20 +47,22 @@ namespace ControlDeGastosMVC.API.Controllers
             }
 
             var totalGastos = await gastosQuery.CountAsync();
+
             var gastosPaginados = await gastosQuery
-                .OrderByDescending(g => g.FechaCreacion)
+                .OrderByDescending(g => g.Fecha)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
+            // Pasamos filtros a la vista
             ViewBag.TotalPages = (int)Math.Ceiling(totalGastos / (double)pageSize);
             ViewBag.CurrentPage = page;
             ViewBag.SearchString = searchString;
+            ViewBag.Mes = mes;
+            ViewBag.Anio = anio;
 
             return View(gastosPaginados);
         }
-
-
 
         #endregion
 
@@ -252,7 +259,7 @@ namespace ControlDeGastosMVC.API.Controllers
 
         #region 6 GET: Gasto/Estadisticas
         [Authorize]
-        public async Task<IActionResult> Estadisticas()
+        public async Task<IActionResult> Estadisticas(int? mes, int? anio)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int usuarioId))
@@ -260,9 +267,15 @@ namespace ControlDeGastosMVC.API.Controllers
                 return Unauthorized();
             }
 
-            var gastos = await _context.Gastos
-                .Where(g => g.UsuarioId == usuarioId)
-                .ToListAsync();
+            var gastosQuery = _context.Gastos
+                .Where(g => g.UsuarioId == usuarioId);
+
+            if (mes.HasValue && anio.HasValue)
+            {
+                gastosQuery = gastosQuery.Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio);
+            }
+
+            var gastos = await gastosQuery.ToListAsync();
 
             var total = gastos.Sum(g => g.Monto);
             var categoriaTop = gastos
@@ -281,7 +294,6 @@ namespace ControlDeGastosMVC.API.Controllers
             };
 
             return View(viewModel);
-
         }
 
         #endregion

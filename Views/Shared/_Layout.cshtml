@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ControlDeGastosMVC.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
@@ -42,7 +41,8 @@
                             </li>
 
                             <li class="nav-item ms-auto me-2 d-flex align-items-center">
-                                <span>👤 Hola, </span><a asp-controller="Users" asp-action="EditPerfil" class="perfil-icono nav-link">@User.Identity.Name</a>
+                                Hola,
+                                <a asp-controller="Users" asp-action="EditPerfil" class="perfil-icono nav-link">@User.Identity.Name</a>
                             </li>
                             <li class="nav-item d-flex align-items-center">
                                 <form asp-controller="Login" asp-action="Logout" method="post" class="d-inline">
@@ -57,15 +57,13 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-1">
             @RenderBody()
         </main>
     </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
-
-
             &copy; 2025 - ControlDeGastosMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
             <br />
             <br />
