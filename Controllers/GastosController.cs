@@ -11,6 +11,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using ControlDeGastosMVC.API.ViewModels;
+using ControlDeGastosMVC.API.Services;
 
 namespace ControlDeGastosMVC.API.Controllers
 {
@@ -18,10 +19,12 @@ namespace ControlDeGastosMVC.API.Controllers
     public class GastosController : Controller
     {
         private readonly GastosDbContext _context;
+        private readonly IGeneratePdfService _pdfService;
 
-        public GastosController(GastosDbContext context)
+        public GastosController(GastosDbContext context, IGeneratePdfService pdfService)
         {
             _context = context;
+            _pdfService = pdfService;
         }
         #region 1 Get Gasto        
 
@@ -31,37 +34,34 @@ namespace ControlDeGastosMVC.API.Controllers
             int pageSize = 10;
             int usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            var gastosQuery = _context.Gastos
-                .Where(g => g.UsuarioId == usuarioId);
+            var gastosQuery = _context.Gastos.Where(g => g.UsuarioId == usuarioId);
 
             if (mes.HasValue && anio.HasValue)
-            {
                 gastosQuery = gastosQuery.Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio);
-            }
 
-            if (!string.IsNullOrWhiteSpace(searchString))
-            {
+            if (!string.IsNullOrEmpty(searchString))
                 gastosQuery = gastosQuery.Where(g =>
                     g.Descripcion.Contains(searchString) ||
                     (g.Categoria != null && g.Categoria.Contains(searchString)));
-            }
 
             var totalGastos = await gastosQuery.CountAsync();
-
             var gastosPaginados = await gastosQuery
                 .OrderByDescending(g => g.Fecha)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Pasamos filtros a la vista
-            ViewBag.TotalPages = (int)Math.Ceiling(totalGastos / (double)pageSize);
-            ViewBag.CurrentPage = page;
-            ViewBag.SearchString = searchString;
-            ViewBag.Mes = mes;
-            ViewBag.Anio = anio;
+            var viewModel = new GastoFiltroViewModel
+            {
+                Gastos = gastosPaginados,
+                Mes = mes,
+                Anio = anio,
+                SearchString = searchString,
+                TotalPages = (int)Math.Ceiling(totalGastos / (double)pageSize),
+                CurrentPage = page
+            };
 
-            return View(gastosPaginados);
+            return View(viewModel);
         }
 
         #endregion
@@ -294,6 +294,18 @@ namespace ControlDeGastosMVC.API.Controllers
             };
 
             return View(viewModel);
+        }
+
+        [Authorize]
+        public IActionResult DescargarPdf()
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var gastos = _context.Gastos
+                .Where(g => g.UsuarioId == userId)
+                .ToList();
+
+            var pdfBytes = _pdfService.GeneratePdf(gastos);
+            return File(pdfBytes, "application/pdf", "Reporte-Gastos.pdf");
         }
 
         #endregion

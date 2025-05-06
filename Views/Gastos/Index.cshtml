@@ -1,4 +1,6 @@
-﻿@model IEnumerable<ControlDeGastosMVC.API.Models.Gasto>
+﻿@using ControlDeGastosMVC.API.ViewModels
+@using ControlDeGastosMVC.API.Models
+@model GastoFiltroViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -14,7 +16,7 @@
         <a asp-action="Estadisticas" class="btn btn-outline-primary">
             <i class="bi bi-bar-chart me-1"></i> Ver Estadísticas
         </a>
-        <a asp-action="ExportarPdf" class="btn btn-outline-danger">
+        <a asp-action="DescargarPdf" class="btn btn-outline-danger">
             <i class="bi bi-file-earmark-pdf me-1"></i>PDF
         </a>
         <a asp-action="ExportarExcel" class="btn btn-outline-success">
@@ -38,64 +40,108 @@
             <i class="bi bi-search me-1"></i> Buscar
         </button>
 
-        <a href="@Url.Action("Index", "Gastos")" class="btn btn-outline-secondary">
-                <i class="bi bi-eraser-fill"></i>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Limpiar
+        <i class="bi bi-eraser-fill"></i>
          </a>
     </form>
 </div>
 
-@if (Model != null && Model.Any())
+@if (Model.Gastos != null && Model.Gastos.Any())
 {
     <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>
                 <th class="text-center">@Html.DisplayName("Descripción")</th>
-                <th class="text-center">@Html.DisplayNameFor(model => model.First().Monto)</th>
-                <th class="text-center">@Html.DisplayNameFor(model => model.First().Categoria)</th>
-                <th class="text-center">@Html.DisplayNameFor(model => model.First().Fecha)</th>
+                <th class="text-center">@Html.DisplayName("Monto")</th>
+                <th class="text-center">@Html.DisplayName("Categoría")</th>
+                <th class="text-center">@Html.DisplayName("Fecha")</th>
                 <th class="text-center">@Html.DisplayName("Fecha Creación")</th>
                 <th class="text-center">@Html.DisplayName("Acciones")</th>
             </tr>
         </thead>
 
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var gasto in Model.Gastos)
             {
                 <tr>
-                    <td class="text-center">@Html.DisplayFor(modelItem => item.Descripcion)</td>
-                    <td class="text-center">$@Html.DisplayFor(modelItem => item.Monto)</td>
-                    <td class="text-center">@Html.DisplayFor(modelItem => item.Categoria)</td>
-                    <td class="text-center">@Html.DisplayFor(modelItem => item.Fecha)</td>
-                    <td class="text-center">@Html.DisplayFor(modelItem => item.FechaCreacion)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => gasto.Descripcion)</td>
+                    <td class="text-center">$@Html.DisplayFor(modelItem => gasto.Monto)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => gasto.Categoria)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => gasto.Fecha)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => gasto.FechaCreacion)</td>
                     <td class="text-center">
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Editar</a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-warning">Detalles</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Eliminar</a>
+                        <a asp-action="Edit" asp-route-id="@gasto.Id" class="btn btn-primary">Editar</a>
+                        <a asp-action="Details" asp-route-id="@gasto.Id" class="btn btn-warning">Detalles</a>
+                        <a asp-action="Delete" asp-route-id="@gasto.Id" class="btn btn-danger">Eliminar</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    @if (ViewBag.TotalPages > 1)
-    {
+    
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
-                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            @{
+                int currentPage = Model.CurrentPage;
+                int totalPages = Model.TotalPages;
+                int maxPagesToShow = 5;
+
+                int startPage = Math.Max(1, currentPage - maxPagesToShow / 2);
+                int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
+
+                if ((endPage - startPage + 1) < maxPagesToShow)
                 {
-                <a class="btn btn-outline-primary mx-1 @(i == ViewBag.CurrentPage ? "active" : "")"
-                        href="@Url.Action("Index", new {
-                    page = i,
-                    searchString = ViewBag.SearchString,
-                    mes = ViewBag.Mes,
-                    anio = ViewBag.Anio
-                    })">
-                    @i
-                </a>
+                    startPage = Math.Max(1, endPage - maxPagesToShow + 1);
                 }
+            }
+
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+
+                    @* Botón anterior *@
+                    @if (currentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new {
+                    page = currentPage - 1,
+                    searchString = Model.SearchString,
+                    mes = Model.Mes,
+                    anio = Model.Anio
+                })">‹</a>
+                        </li>
+                    }
+
+                    @* Páginas visibles *@
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new {
+                    page = i,
+                    searchString = Model.SearchString,
+                    mes = Model.Mes,
+                    anio = Model.Anio
+                })">@i</a>
+                        </li>
+                    }
+
+                    @* Botón siguiente *@
+                    @if (currentPage < totalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new {
+                    page = currentPage + 1,
+                    searchString = Model.SearchString,
+                    mes = Model.Mes,
+                    anio = Model.Anio
+                })">›</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+
+
             </ul>
         </nav>
-    }
-
 }
 else
 {

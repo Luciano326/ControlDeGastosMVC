@@ -4,19 +4,28 @@
     var categoriasJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Categorias);
     var montosJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Montos);
 }
+
 <h1>Estadísticas</h1>
 <hr />
 <div class="d-flex flex-wrap align-items-center justify-content-end mb-0">
     <form asp-action="Estadisticas" method="get" class="d-flex mt-6 mt-md-0" role="search">
-        <input type="number" name="mes" class="form-control m-0 mb-md-1 w-auto"
-               placeholder="Mes" min="1" max="12" />
+        <input type="number" name="mes" class="form-control m-0 mb-md-1 mx-2 w-auto"
+               placeholder="Mes" min="1" max="12"
+               value="@ViewBag.Mes" />
 
         <input type="number" name="anio" class="form-control m-0 mb-md-1 mx-2 w-auto"
-               placeholder="Año" min="2000" max="2100" />
+               placeholder="Año" min="2000" max="2100"
+               value="@ViewBag.Anio" />
 
-        <button type="submit" class="btn btn-primary m-0 mb-md-1 w-auto">
+
+        <button type="submit" class="btn btn-primary m-0 mb-md-1 w-auto" >
             <i class="bi bi-search me-1"></i>Buscar
         </button>
+        
+        <a asp-action="Estadisticas" class="btn btn-outline-secondary mx-2 m-0 mb-md-1 w-auto">
+            Limpiar
+            <i class="bi bi-eraser-fill"></i>
+        </a>
     </form>
 </div>
 <hr />
@@ -125,5 +134,4 @@
         }
     });
 </script>
-
 

@@ -1,5 +1,6 @@
 using ControlDeGastosMVC.API.Context;
 using ControlDeGastosMVC.API.Models;
+using ControlDeGastosMVC.API.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +28,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 builder.Services.AddAuthorization();
-
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+builder.Services.AddTransient<IGeneratePdfService, GeneratePdfService>();
 
 var app = builder.Build();
 
