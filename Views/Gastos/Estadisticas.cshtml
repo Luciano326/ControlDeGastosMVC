@@ -28,6 +28,7 @@
         </a>
     </form>
 </div>
+
 <hr />
 
 <div class="container mb-4">
@@ -62,16 +63,20 @@
 <hr />
 
 <div class="container">
-    <div class="row mb-4 justify-content-center">
-        <div class="card col-md-8 shadow-sm justify-content-end">
-            <h5 class="text-center">Gráfico de barras</h5>
+    <div class="row mb-4 justify-content-lg-between">
+        <div class="card shadow-sm w-75 justify-content-between">
+            <h3 class="text-center">Gráfico de barras</h3>
             <div style="height: 400px;">
                 <canvas id="graficoBarras"></canvas>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="card col-md-8 shadow-sm mt-5 justify-content-end">
-            <h5 class="text-center">Gráfico de torta</h5>
+<div class="container">
+    <div class="row mb-4 justify-content-end">
+        <div class="card shadow-sm mt-2 w-75">
+            <h3 class="text-center">Gráfico de torta</h3>
             <div style="height: 400px;">
                 <canvas id="graficoTorta"></canvas>
             </div>
@@ -79,9 +84,7 @@
     </div>
 </div>
 
-
 <hr />
-
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

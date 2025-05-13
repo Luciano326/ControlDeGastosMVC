@@ -3,7 +3,7 @@
 @model GastoFiltroViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Control de Gastos";
 }
 
 <h1>Control de Gastos</h1>
@@ -16,21 +16,34 @@
         <a asp-action="Estadisticas" class="btn btn-outline-primary">
             <i class="bi bi-bar-chart me-1"></i> Ver Estadísticas
         </a>
-        <a asp-action="DescargarPdf" class="btn btn-outline-danger">
-            <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+        <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exportModal" onclick="setExportAction('pdf')">
+            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
         </a>
-        <a asp-action="ExportarExcel" class="btn btn-outline-success">
-            <i class="bi bi-file-earmark-excel me-1"></i>Excel
+        <a href="#" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exportModal" onclick="setExportAction('excel')">
+            <i class="bi bi-file-earmark-excel me-1"></i> Excel
         </a>
     </div>
-    <form asp-action="Index" method="get" class="d-flex flex-wrap align-items-end gap-2 mb-3">
-        <input type="number" name="mes" class="form-control w-auto"
-               placeholder="Mes" min="1" max="12"
-               value="@ViewBag.Mes" />
 
-        <input type="number" name="anio" class="form-control w-auto"
-               placeholder="Año" min="2000" max="2100"
-               value="@ViewBag.Anio" />
+    <form asp-action="Index" method="get" class="d-flex flex-wrap align-items-end gap-2 mb-3 mt-3">
+        <div class="">
+            <select name="mes" id="mes" class="form-select" >
+                <option value="">Seleccionar mes</option>
+                @for (int i = 1; i <= 12; i++)
+                {
+                    <option value="@i">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)</option>
+                }
+            </select>
+        </div>
+
+        <div class="">
+            <select name="anio" id="anio" class="form-select" >
+                <option value="">Seleccionar año</option>
+                @for (int year = 2020; year <= DateTime.Now.Year + 5; year++)
+                {
+                    <option value="@year">@year</option>
+                }
+            </select>
+        </div>
 
         <input type="text" name="searchString" class="form-control w-auto"
                placeholder="Buscar descripción o categoría"
@@ -70,78 +83,88 @@
                     <td class="text-center">@Html.DisplayFor(modelItem => gasto.Fecha)</td>
                     <td class="text-center">@Html.DisplayFor(modelItem => gasto.FechaCreacion)</td>
                     <td class="text-center">
-                        <a asp-action="Edit" asp-route-id="@gasto.Id" class="btn btn-primary">Editar</a>
-                        <a asp-action="Details" asp-route-id="@gasto.Id" class="btn btn-warning">Detalles</a>
-                        <a asp-action="Delete" asp-route-id="@gasto.Id" class="btn btn-danger">Eliminar</a>
+                        <a asp-action="Edit" asp-route-id="@gasto.Id" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a asp-action="Details" asp-route-id="@gasto.Id" class="btn btn-warning">
+                            <i class="bi bi-info-square"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@gasto.Id" class="btn btn-danger">
+                            <i class="bi bi-trash3"></i>
+                        </a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
     
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-            @{
-                int currentPage = Model.CurrentPage;
-                int totalPages = Model.TotalPages;
-                int maxPagesToShow = 5;
 
-                int startPage = Math.Max(1, currentPage - maxPagesToShow / 2);
-                int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
-
-                if ((endPage - startPage + 1) < maxPagesToShow)
-                {
-                    startPage = Math.Max(1, endPage - maxPagesToShow + 1);
-                }
-            }
-
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-
-                    @* Botón anterior *@
-                    @if (currentPage > 1)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" href="@Url.Action("Index", new {
-                    page = currentPage - 1,
-                    searchString = Model.SearchString,
-                    mes = Model.Mes,
-                    anio = Model.Anio
-                })">‹</a>
-                        </li>
-                    }
-
-                    @* Páginas visibles *@
-                    @for (int i = startPage; i <= endPage; i++)
-                    {
-                        <li class="page-item @(i == currentPage ? "active" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new {
-                    page = i,
-                    searchString = Model.SearchString,
-                    mes = Model.Mes,
-                    anio = Model.Anio
-                })">@i</a>
-                        </li>
-                    }
-
-                    @* Botón siguiente *@
-                    @if (currentPage < totalPages)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" href="@Url.Action("Index", new {
-                    page = currentPage + 1,
-                    searchString = Model.SearchString,
-                    mes = Model.Mes,
-                    anio = Model.Anio
-                })">›</a>
-                        </li>
-                    }
-                </ul>
-            </nav>
+    int maxPagesToShow = 4;
+    int currentPage = Model.CurrentPage;
+    int totalPages = Model.TotalPages;
+    
+    int startPage = Math.Max(1, currentPage - maxPagesToShow / 2);
+    int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
+    if (endPage - startPage < maxPagesToShow - 1)
+    {
+        startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+    }
 
 
-            </ul>
-        </nav>
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        @* Botón Primera Página *@
+        @if (currentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { page = 1, searchString = Model.SearchString, mes = Model.Mes, anio = Model.Anio })">
+                    «
+                </a>
+            </li>
+        }
+
+        @* Botón Página Anterior *@
+        @if (currentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1, searchString = Model.SearchString, mes = Model.Mes, anio = Model.Anio })">
+                    ‹
+                </a>
+            </li>
+        }
+
+        @* Números de página *@
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = Model.SearchString, mes = Model.Mes, anio = Model.Anio })">
+                    @i
+                </a>
+            </li>
+        }
+
+        @* Botón Página Siguiente *@
+        @if (currentPage < totalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1, searchString = Model.SearchString, mes = Model.Mes, anio = Model.Anio })">
+                    ›
+                </a>
+            </li>
+        }
+
+        @* Botón Última Página *@
+        @if (currentPage < totalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { page = totalPages, searchString = Model.SearchString, mes = Model.Mes, anio = Model.Anio })">
+                    »
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+
 }
 else
 {
@@ -151,5 +174,55 @@ else
         </div>
     </div>
 }
+
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="get" id="exportForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Exportar por mes/año</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Selects de mes y año -->
+                    <div class="mb-3">
+                        <label for="mes" class="form-label">Mes</label>
+                        <select name="mes" id="mes" class="form-select" required>
+                            <option value="">Seleccionar mes</option>
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="anio" class="form-label">Año</label>
+                        <select name="anio" id="anio" class="form-select" required>
+                            <option value="">Seleccionar año</option>
+                            @for (int year = 2020; year <= DateTime.Now.Year + 5; year++)
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Exportar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function setExportAction(type) {
+        const form = document.getElementById('exportForm');
+        if (type === 'pdf') {
+            form.action = '@Url.Action("DescargarPdf", "Gastos")';
+        } else if (type === 'excel') {
+            form.action = '@Url.Action("DescargarExcel", "Gastos")';
+        }
+    }
+</script>
 
 

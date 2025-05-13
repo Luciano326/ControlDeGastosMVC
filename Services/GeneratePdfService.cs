@@ -1,4 +1,6 @@
-﻿using ControlDeGastosMVC.API.Models;
+﻿using ControlDeGastosMVC.API.Controllers;
+using ControlDeGastosMVC.API.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -9,19 +11,24 @@ namespace ControlDeGastosMVC.API.Services
 {
     public class GeneratePdfService : IGeneratePdfService
     {
-        public byte[] GeneratePdf(List<Gasto> gastos)
+        public byte[] GeneratePdf(List<Gasto> gastos, int mes, int anio)
         {
+            var gastosFiltrados = gastos
+                .Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio)
+                .OrderByDescending(g => g.Fecha)
+                .ToList();
             var document = Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Margin(30);
+
                     page.Size(PageSizes.A4);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11));
 
-                    page.Header().Text("Reporte de Gastos")
-                        .SemiBold().FontSize(20).FontColor(Colors.Blue.Medium);
+                    page.Header().Text($"Reporte de gastos - {mes:D2}/{anio}")
+                                     .FontSize(16).Bold().AlignCenter();
 
                     page.Content().PaddingVertical(10).Table(table =>
                     {
@@ -53,7 +60,7 @@ namespace ControlDeGastosMVC.API.Services
                         });
 
                         int index = 1;
-                        foreach (var gasto in gastos)
+                        foreach (var gasto in gastosFiltrados)
                         {
                             table.Cell().Element(RowStyle).Text(index++);
                             table.Cell().Element(RowStyle).Text(gasto.Descripcion);

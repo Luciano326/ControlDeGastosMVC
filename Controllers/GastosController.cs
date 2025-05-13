@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ControlDeGastosMVC.API.Models;
 using ControlDeGastosMVC.API.Context;
@@ -12,6 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using ControlDeGastosMVC.API.ViewModels;
 using ControlDeGastosMVC.API.Services;
+using ClosedXML;
+using System.ComponentModel;
+using NuGet.Packaging;
+using ClosedXML.Excel;
 
 namespace ControlDeGastosMVC.API.Controllers
 {
@@ -257,7 +256,7 @@ namespace ControlDeGastosMVC.API.Controllers
         }
         #endregion
 
-        #region 6 GET: Gasto/Estadisticas
+        #region 6 GET: Gasto/Estadisticas/Descargas
         [Authorize]
         public async Task<IActionResult> Estadisticas(int? mes, int? anio)
         {
@@ -297,17 +296,50 @@ namespace ControlDeGastosMVC.API.Controllers
         }
 
         [Authorize]
-        public IActionResult DescargarPdf()
+        public IActionResult DescargarPdf(int mes, int anio)
         {
-            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var gastos = _context.Gastos
-                .Where(g => g.UsuarioId == userId)
+                .Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio)
+                .OrderByDescending(g => g.Fecha)
                 .ToList();
 
-            var pdfBytes = _pdfService.GeneratePdf(gastos);
-            return File(pdfBytes, "application/pdf", "Reporte-Gastos.pdf");
+            var pdf = _pdfService.GeneratePdf(gastos, mes, anio);
+
+            return File(pdf, "application/pdf", $"Gastos_{mes:D2}_{anio}.pdf");
         }
 
+        [Authorize]
+        public IActionResult DescargarExcel(int mes, int anio)
+        {
+            var gastos = _context.Gastos
+                .Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio)
+                .OrderByDescending(g => g.Fecha)
+                .ToList();
+
+            using (var libro = new XLWorkbook())
+            {
+                var hoja = libro.Worksheets.Add("Gastos");
+
+                hoja.Cell(1, 1).Value = "Descripción";
+                hoja.Cell(1, 2).Value = "Categoría";
+                hoja.Cell(1, 3).Value = "Fecha";
+                hoja.Cell(1, 4).Value = "Monto";
+
+                for (int i = 0; i < gastos.Count; i++)
+                {
+                    hoja.Cell(i + 2, 1).Value = gastos[i].Descripcion;
+                    hoja.Cell(i + 2, 2).Value = gastos[i].Categoria ?? "Sin categoría";
+                    hoja.Cell(i + 2, 3).Value = gastos[i].Fecha.ToString("dd/MM/yyyy");
+                    hoja.Cell(i + 2, 4).Value = gastos[i].Monto;
+                }
+                hoja.Columns().AdjustToContents();
+                using (var stream = new MemoryStream())
+                {
+                    libro.SaveAs(stream);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Gastos_{mes:D2}_{anio}.xlsx");
+                }
+            }
+        } 
         #endregion
     }
 }
