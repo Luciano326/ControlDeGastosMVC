@@ -1,5 +1,6 @@
 ﻿using ControlDeGastosMVC.API.Context;
 using ControlDeGastosMVC.API.Models;
+using ControlDeGastosMVC.API.Services;
 using ControlDeGastosMVC.API.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 
 namespace ControlDeGastosMVC.API.Controllers
@@ -24,9 +27,11 @@ namespace ControlDeGastosMVC.API.Controllers
 
         private readonly GastosDbContext _context;
         private readonly IPasswordHasher<Usuario> _passwordHasher;
+        private readonly IEmailService _emailService;
 
-        public LoginController(GastosDbContext context, IPasswordHasher<Usuario> passwordHasher)
+        public LoginController(GastosDbContext context, IPasswordHasher<Usuario> passwordHasher, IEmailService emailService)
         {
+            _emailService = emailService;
             _context = context;
             _passwordHasher = passwordHasher;
         }
@@ -133,14 +138,20 @@ namespace ControlDeGastosMVC.API.Controllers
                 ExpiraEn = fechaExpiracion, // o más si querés
                 Usado = false
             };
-
+            
             _context.RecuperacionPassword.Add(recuperacion);
             await _context.SaveChangesAsync();
 
-            // Acá más adelante vamos a armar el link para enviar por email
-            //var link = Url.Action("RestablecerClave", "Login", new { token = token }, Request.Scheme);
+            var correo = new EmailDTO()
+            {
+                Para = email,
+                Asunto = $"Recuperación de contraseña {usuario.NombreCompleto}",
+                Contenido = $"Token de recuperación generado. (Token: {token})",
+            };
 
-            TempData["ToastMensaje"] = $"Token de recuperación generado. (Token: {token})";
+            _emailService.SendEmail(correo);
+
+            TempData["ToastMensaje"] = $"Token enviado correctamente. Verificar correo {email}";
             TempData["ToastTipo"] = "info";
             return RedirectToAction("VerificarToken", new { email = email });
         }
@@ -277,35 +288,20 @@ namespace ControlDeGastosMVC.API.Controllers
                 return RedirectToAction("Login");
             }
 
-
             // Cambiar la contraseña
             usuario.PasswordHash = _passwordHasher.HashPassword(usuario, nuevaClave);
             _context.Usuarios.Update(usuario);
 
-            // Log para depuración
-            Console.WriteLine($"Antes de marcar el token como usado: {recuperacion.Token}, Usado: {recuperacion.Usado}");
-
-            recuperacion.Usado = true;
+             recuperacion.Usado = true;
             _context.RecuperacionPassword.Update(recuperacion);
 
-            // Log para depuración después de la actualización
-            Console.WriteLine($"Después de marcar el token como usado: {recuperacion.Token}, Usado: {recuperacion.Usado}");
-
             await _context.SaveChangesAsync();
-
-
-            // Logs para verificar los cambios realizados
-            Console.WriteLine($"Contraseña cambiada y token marcado como usado: {recuperacion.Usado}");
 
             TempData["ToastMensaje"] = "Contraseña actualizada exitosamente.";
             TempData["ToastTipo"] = "success";
 
             return RedirectToAction("Login");
         }
-
-
-
-
         #endregion
     }
 }
