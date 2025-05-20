@@ -1,46 +1,54 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome Sistema Gastos</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mb-4">
+    <h1 class="display-5">Bienvenido al Sistema de Control de Gastos</h1>
+    <p class="lead">Accedé rápidamente a las funciones principales del sistema</p>
 </div>
 
-<div class="d-sm-inline-flex justify-content-sm-center">
-    <div class="card m-2" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+<div class="row justify-content-center">
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-plus-circle fa-2x mb-3 text-primary"></i>
+                <h5 class="card-title">Registrar Gasto</h5>
+                <p class="card-text">Agregá un nuevo gasto fácilmente.</p>
+                <a asp-controller="Gastos" asp-action="Create" class="btn btn-outline-primary">Ir</a>
+            </div>
         </div>
     </div>
 
-    <div class="card m-2" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-list fa-2x mb-3 text-success"></i>
+                <h5 class="card-title">Historial</h5>
+                <p class="card-text">Revisá todos los gastos registrados.</p>
+                <a asp-controller="Gastos" asp-action="Index" class="btn btn-outline-success">Ver</a>
+            </div>
         </div>
     </div>
 
-    <div class="card m-2" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-line fa-2x mb-3 text-info"></i>
+                <h5 class="card-title">Reportes</h5>
+                <p class="card-text">Visualizá resúmenes mensuales y totales.</p>
+                <a asp-controller="Gastos" asp-action="Estadisticas" class="btn btn-outline-info">Reportes</a>
+            </div>
         </div>
     </div>
 
-    <div class="card m-2" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-file-pdf fa-2x mb-3 text-danger"></i>
+                <h5 class="card-title">Exportar PDF/EXCEL</h5>
+                <p class="card-text">Generá reportes descargables.</p>
+                <a asp-controller="Gastos" asp-action="Index" class="btn btn-outline-danger">Exportar</a>
+            </div>
         </div>
     </div>
 </div>

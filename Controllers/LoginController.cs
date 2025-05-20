@@ -125,7 +125,7 @@ namespace ControlDeGastosMVC.API.Controllers
             {
                 TempData["ToastMensaje"] = "No se encontró un usuario con ese correo.";
                 TempData["ToastTipo"] = "warning";
-                return RedirectToAction("Login");
+                return RedirectToAction("VerificarToken");
             }
 
             // Generar token aleatorio
@@ -146,7 +146,15 @@ namespace ControlDeGastosMVC.API.Controllers
             {
                 Para = email,
                 Asunto = $"Recuperación de contraseña {usuario.NombreCompleto}",
-                Contenido = $"Token de recuperación generado. (Token: {token})",
+                Contenido = $"<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <style>\r\n        .email-container {{\r\n            " +
+                $"font-family: Arial, sans-serif;\r\n            background-color: #f9f9f9;\r\n            padding: 20px;\r\n            border-radius: 8px;\r\n            " +
+                $"color: #333;\r\n            max-width: 500px;\r\n            margin: auto;\r\n            border: 1px solid #ddd;\r\n        }}\r\n        .token {{\r\n            " +
+                $"font-size: 20px;\r\n            font-weight: bold;\r\n            color: #0056b3;\r\n            background-color: #eef5ff;\r\n            padding: 10px;\r\n            " +
+                $"border-radius: 5px;\r\n            display: inline-block;\r\n            margin-top: 10px;\r\n        }}\r\n    </style>\r\n</head>\r\n<body>\r\n    " +
+                $"<div class=\"email-container\">\r\n        <h2>Recuperación de contraseña</h2>\r\n        <p>Se ha generado un token de recuperación para tu cuenta.</p>\r\n       " +
+                $" <p>Utilizá el siguiente token para completar el proceso:</p>\r\n        <div class=\"token\">{token}</div>\r\n        " +
+                $"<p style=\"margin-top: 20px;\">Este token es válido solo por un tiempo limitado. Si no solicitaste este código, podés ignorar este correo.</p>\r\n    " +
+                $"</div>\r\n</body>\r\n</html>\r\n",
             };
 
             _emailService.SendEmail(correo);

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Globalization;
 using System.Security.Claims;
 
@@ -81,7 +82,6 @@ namespace ControlDeGastosMVC.API.Controllers
         {
             var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario == null) return NotFound();
-
             if (usuario.Id == 21)
             {
                 TempData["ToastMensaje"] = "No puedes utilizar esta función en " + usuario.Email;

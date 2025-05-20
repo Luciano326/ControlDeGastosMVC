@@ -22,6 +22,28 @@
                 <button type="submit" class="btn btn-primary">Verificar</button>
                 <a asp-controller="Login" asp-action="Login" class="btn btn-secondary">Cancelar</a>
             </form>
+            <div class="mt-3">
+                <strong>Este código expirará en: <span id="timer">02:00</span></strong>
+            </div>
         </div>
     </div>
 </div>
+
+
+<script>
+    let duration = 120;
+    const timerElement = document.getElementById("timer");
+
+    const countdown = setInterval(() => {
+        const minutes = Math.floor(duration / 60);
+        const seconds = duration % 60;
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        duration--;
+
+        if (duration < 0) {
+            clearInterval(countdown);
+            timerElement.textContent = "Expirado";
+            document.querySelector("form button[type='submit']").disabled = true;
+        }
+    }, 1000);
+</script>

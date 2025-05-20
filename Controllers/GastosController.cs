@@ -59,6 +59,9 @@ namespace ControlDeGastosMVC.API.Controllers
                 TotalPages = (int)Math.Ceiling(totalGastos / (double)pageSize),
                 CurrentPage = page
             };
+            ViewBag.Mes = mes;
+            ViewBag.Anio = anio;
+            ViewBag.SearchString = searchString;
 
             return View(viewModel);
         }
