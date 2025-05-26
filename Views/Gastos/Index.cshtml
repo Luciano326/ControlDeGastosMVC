@@ -80,9 +80,10 @@
         <tbody>
             @foreach (var gasto in Model.Gastos)
             {
+                
                 <tr>
                     <td class="text-center">@Html.DisplayFor(modelItem => gasto.Descripcion)</td>
-                    <td class="text-center">$@Html.DisplayFor(modelItem => gasto.Monto)</td>
+                    <td class="text-center">@("$" + gasto.Monto.ToString("N2"))</td>
                     <td class="text-center">@Html.DisplayFor(modelItem => gasto.Categoria)</td>
                     <td class="text-center">@Html.DisplayFor(modelItem => gasto.Fecha)</td>
                     <td class="text-center">@Html.DisplayFor(modelItem => gasto.FechaCreacion)</td>
