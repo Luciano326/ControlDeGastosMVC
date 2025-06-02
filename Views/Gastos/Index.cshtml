@@ -27,25 +27,21 @@
 
     <form asp-action="Index" method="get" class="d-flex flex-wrap align-items-end gap-2 mb-3 mt-3">
         <div class="">
-            <select name="mes" id="mes" class="form-select">
+            <select name="mes" id="mes" class="form-select" required>
                 <option value="">Seleccionar mes</option>
                 @for (int i = 1; i <= 12; i++)
                 {
-                    <option value="@(ViewBag.Mes != null && ViewBag.Mes == i ? "selected" : "")">
-                        @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)
-                    </option>
+                    <option value="@i">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)</option>
                 }
             </select>
         </div>
 
         <div class="">
-            <select name="anio" id="anio" class="form-select">
+            <select name="anio" id="anio" class="form-select" required>
                 <option value="">Seleccionar año</option>
                 @for (int year = 2020; year <= DateTime.Now.Year + 5; year++)
                 {
-                    <option value="@(ViewBag.Anio != null && ViewBag.Anio == year ? "selected" : "")">
-                        @year
-                    </option>
+                    <option value="@year">@year</option>
                 }
             </select>
         </div>

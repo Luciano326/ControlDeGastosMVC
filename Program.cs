@@ -24,7 +24,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.LoginPath = "/Login/Login";
         options.AccessDeniedPath = "/Login/AccessDenied"; // Opcional
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10); // Opcional: expira tras 30 mins
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10); // Opcional: expira tras 10 mins
         options.SlidingExpiration = true; // Renueva si sigue activo
     });
 
